@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <div>
     <div id="head">
@@ -19,6 +18,7 @@
       </div>
     </div>
     <div class="cart">
+      <h3 v-if="cart.items.length > 0">Total: {{ cart.total }} €</h3>
       <h3 v-if="cart.items.length > 0">Cart: [{{ cart.items.length }}]</h3>
       <ul v-if="cart.items.length > 0" style="list-style-type: none">
         <li symbol="+" v-for="item in cart.items" :key="item.id">
@@ -27,7 +27,6 @@
         <li v-if="!premium">+{{ shipping_cost }} €</li>
         <li v-else>+ free shipping</li>
       </ul>
-      <h3 v-if="cart.items.length > 0">Total: {{ cart.total }}€</h3>
       <h3 v-else>Cart is empty</h3>
     </div>
     <div class="products">
@@ -75,26 +74,28 @@
           </button>
         </div>
       </div>
-
-      <product-tabs></product-tabs>
-
-      <h2>Product Review</h2>
-      <p v-if="!reviews.length">There are no reviews available</p>
-      <ul>
-        <li v-for="review in reviews" :key="review.id">
-          {{ review.name }} - Rating: {{ review.rating }} - Review:
-          {{ review.review }}
-        </li>
-      </ul>
-      <product-review @review-submitted="addReview"></product-review>
     </div>
+    <ProductReview></ProductReview>
+    <span class="tab" v-for="(tab, index) in tabs" :key="index">{{ tab }}</span>
+
+    <h2>Product Review</h2>
+    <p v-if="!reviews.length">There are no reviews available</p>
+    <ul>
+      <li v-for="review in reviews" :key="review.id">
+        {{ review.name }} - Rating: {{ review.rating }} - Review:
+        {{ review.review }}
+      </li>
+    </ul>
+    <product-review @review-submitted="addReview"></product-review>
   </div>
 </template>
 
 <script lang="ts">
-import App from "../App.vue";
+import { Component, Vue } from "vue-property-decorator";
 import blueSocks from "../assets/vmSocks-blue-onWhite.jpg";
 import greenSocks from "../assets/vmSocks-green-onWhite.jpg";
+import ProductReview from "./components/ProductReview.vue";
+const eventBus = new Vue();
 
 export default {
   name: "Product",
@@ -112,6 +113,7 @@ export default {
   },
   data() {
     return {
+      tabs: ["Reviews", "Make Review"],
       cart: {
         total: 0,
         items: [],
@@ -205,6 +207,11 @@ export default {
         ? "Premium Account: Shipping is free!"
         : `Normal Account: Shipping cost: ${this.shipping_cost} €`;
     },
+  },
+  mounted: function () {
+    eventBus.$on("review-submitted", (productReview) => {
+      this.reviews.push(productReview);
+    });
   },
 };
 </script>

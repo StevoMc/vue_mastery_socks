@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <div id="app">
     <Product :premium="premium"></Product>
@@ -8,13 +7,21 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Product from "./components/Product.vue";
+import ProductReview from "./components/Product.vue";
 
 @Component({
   components: {
     Product,
+    ProductReview,
   },
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  data() {
+    return {
+      premium: true,
+    };
+  }
+}
 </script>
 
 <style>
